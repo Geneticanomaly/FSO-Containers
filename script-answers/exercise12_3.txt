@@ -1,0 +1,13 @@
+Commands and operations
+
+apt-get update
+apt-get -y install nano
+nano /usr/src/app/index.js
+
+Then in nano I typed the following
+console.log('Hello World')
+
+To exit and save what I had typed
+ctrl + x --> y --> enter
+
+cat /usr/src/app/index.js - To see what is inside the index.js file.
