@@ -1,0 +1,12 @@
+Commands
+
+apt-get update
+apt-get -y install curl
+curl -sL https://deb.nodesource.com/setup_20.x | bash
+apt-get install nodejs -y
+
+Geographic area: 8 (Europe)
+Time zone: 18 (Helsinki)
+
+node /usr/src/app/index.js
+Output: Hello World
