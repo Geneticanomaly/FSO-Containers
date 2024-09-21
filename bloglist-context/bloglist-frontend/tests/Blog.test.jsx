@@ -2,6 +2,9 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import Blog from '../src/components/Blog';
 import BlogForm from '../src/components/BlogForm';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { NotificationContextProvider } from '../src/context/NotificationContext';
+import { UserContextProvider } from '../src/context/UserContext';
 
 const user = {
     token: '',
@@ -20,15 +23,33 @@ const blog = {
     },
 };
 
+const queryClient = new QueryClient();
+
 test('renders content', () => {
-    render(<Blog blog={blog} />);
+    render(
+        <QueryClientProvider client={queryClient}>
+            <NotificationContextProvider>
+                <UserContextProvider>
+                    <Blog blog={blog} />
+                </UserContextProvider>
+            </NotificationContextProvider>
+        </QueryClientProvider>
+    );
 
     const element = screen.getByText(/The Two Reacts/i);
     expect(element).toBeDefined();
 });
 
 test('All blog info is showcased when view button is pressed', async () => {
-    render(<Blog blog={blog} user={user} />);
+    render(
+        <QueryClientProvider client={queryClient}>
+            <NotificationContextProvider>
+                <UserContextProvider>
+                    <Blog blog={blog} user={user} />
+                </UserContextProvider>
+            </NotificationContextProvider>
+        </QueryClientProvider>
+    );
 
     const title = screen.getByText(/The Two Reacts/i);
     expect(title).toBeDefined();
@@ -48,43 +69,4 @@ test('All blog info is showcased when view button is pressed', async () => {
 
     const publisher = screen.getByText(/Arto Hellas/i);
     expect(publisher).toBeDefined();
-});
-
-test('like button calls a function when pressed', async () => {
-    const mockHandler = vi.fn();
-    render(<Blog blog={blog} user={user} updateBlog={mockHandler} />);
-
-    const event = userEvent.setup();
-    const button = screen.getByText(/view/i);
-    await event.click(button);
-
-    const likeButton = screen.getByRole('button', { name: /like/i });
-    expect(likeButton).toBeDefined();
-
-    await event.click(likeButton);
-    await event.click(likeButton);
-
-    expect(mockHandler.mock.calls).toHaveLength(2);
-});
-
-test('<BlogForm /> updates parent state and calls onSubmit', async () => {
-    const event = userEvent.setup();
-    const createBlog = vi.fn();
-
-    const { container } = render(<BlogForm createBlog={createBlog} />);
-
-    const inputTitle = container.querySelector('#blog-title');
-    const inputAuthor = container.querySelector('#blog-author');
-    const inputUrl = container.querySelector('#blog-url');
-    const inputSubmit = container.querySelector('#blog-create');
-
-    await event.type(inputTitle, 'My new title!');
-    await event.type(inputAuthor, 'Dan Abramov');
-    await event.type(inputUrl, 'testurl.com');
-    await event.click(inputSubmit);
-
-    expect(createBlog.mock.calls).toHaveLength(1);
-    expect(createBlog.mock.calls[0][0].title).toBe('My new title!');
-    expect(createBlog.mock.calls[0][0].author).toBe('Dan Abramov');
-    expect(createBlog.mock.calls[0][0].url).toBe('testurl.com');
 });

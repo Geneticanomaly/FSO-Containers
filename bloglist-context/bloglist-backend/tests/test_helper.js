@@ -44,8 +44,6 @@ const initializeDb = async () => {
     await User.deleteMany({});
     await Blog.deleteMany({});
 
-    console.log('Database cleared');
-
     const salt = await bcrypt.genSalt(10);
     const passwordHash = await bcrypt.hash(initialUsers[0].password, salt);
 
