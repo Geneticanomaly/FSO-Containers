@@ -1,0 +1,42 @@
+services:
+    app:
+        image: bloglist-front-dev
+        build:
+            context: ./bloglist-frontend
+            dockerfile: dev.Dockerfile
+        volumes:
+            - ./bloglist-frontend:/usr/src/app
+            - /usr/src/app/node_modules/
+        environment:
+            - VITE_BACKEND_URL=${VITE_BACKEND_URL}
+        container_name: bloglist-front-dev
+
+    server:
+        image: bloglist-back-dev
+        build:
+            context: ./bloglist-frontend
+            dockerfile: dev.Dockerfile
+        volumes:
+            - ./bloglist-backend:/usr/src/app
+        environment:
+            - MONGODB_URI=${MONGODB_URI}
+        container_name: bloglist-back-dev
+
+    nginx:
+        image: nginx:1.20.1
+        volumes:
+            - ./nginx.dev.conf:/etc/nginx/nginx.conf:ro
+        ports:
+            - 8080:80
+        container_name: bloglist-reverse-proxy
+        depends_on:
+            - app
+
+    mongo:
+        image: mongo
+        ports:
+            - 3456:27017
+        environment:
+            MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+            MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+            MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE}
